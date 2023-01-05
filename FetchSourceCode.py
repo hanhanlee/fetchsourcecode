@@ -16,11 +16,14 @@ logging.basicConfig(level=logging.INFO)
 Python_version = sys.version_info[0]
 today = datetime.date.today()
 
+def file_size(file_path):
+    if os.path.isfile(file_path):
+        file_info = os.stat(file_path)
+        return file_info.st_size
 
+print("Current Python version: "+str(Python_version))
 
-logging.info("Current Python version: "+str(Python_version))
-
-logging.info("Select SPX Version: 1. LTS-v12 2. LTS-v13 3. Update 1&2 0. Exit ")
+print("Select SPX Version: 1. LTS-v12 2. LTS-v13 3. Update 1&2 0. Exit ")
 #SPX_Version = 1 - LTS-v12 2- LTS-v13
 while True:
     try:
@@ -34,8 +37,8 @@ MagicNumber = SPX_Version
 if SPX_Version == 0:
     exit()
 elif SPX_Version == 1:
-    logging.info("LTS-v12")
-    logging.info("Select Platform: 1. AST2500EVB 2. Wolfpass 3. Ethanol-x 0. Exit")
+    print("LTS-v12")
+    print("Select Platform: 1. AST2500EVB 2. Wolfpass 3. Ethanol-x 0. Exit")
     while True:
         try:
             Platform = int(input())
@@ -44,8 +47,8 @@ elif SPX_Version == 1:
             print("No valid input! Please try again ...")
     MagicNumber = MagicNumber*10  + Platform
 elif SPX_Version == 2:
-    logging.info("LTS-v13")
-    logging.info("Select Platform: 1. AST2600EVB 2. Archercity 3. Quartz 0. Exit")
+    print("LTS-v13")
+    print("Select Platform: 1. AST2600EVB 2. Archercity 3. Quartz 0. Exit")
     while True:
         try:
             Platform = int(input())
@@ -54,8 +57,8 @@ elif SPX_Version == 2:
             print("No valid input! Please try again ...")
     MagicNumber = MagicNumber*10  + Platform
 elif SPX_Version == 3:
-    logging.info("Update 1&2")
-    logging.info("Select Platform 1. AST2500EVB 2. Wolfpass 3. ethanol-x")
+    print("Update 1&2")
+    print("Select Platform 1. AST2500EVB 2. Wolfpass 3. ethanol-x")
     while True:
         try:
             Platform = int(input())
@@ -87,16 +90,16 @@ elif SPX_Version == 3:
         else:
             BRANCH = input()
     else:
-        logging.info("incorrect input"+ BRANCH)
+        print("incorrect input"+ BRANCH)
         exit()
 
 else:
-    logging.info("other_version")
+    print("other_version")
 
 if Platform == 0:
     exit()
 if __debug__:
-    logging.info("MagicNumber: "+MagicNumber)
+    logging.info("MagicNumber: "+str(MagicNumber))
 
 #Set Parameter
 if MagicNumber == 11: #AST2500EVB
@@ -138,21 +141,31 @@ else:
     print("incorrect Input! MagicNumber = ",MagicNumber)
     exit()
 
-print(REPOSITORY)
-print(BRANCH)
-print(WORKSPACE)
+logging.debug(REPOSITORY)
+logging.debug(BRANCH)
+logging.debug(WORKSPACE)
+
+#check log filesize
+LOG_PATH = "fetch.log"
+Log_Size = file_size(LOG_PATH)
+if Log_Size > 1000:
+    os.unlink(LOG_PATH)
+
 #Combine commands:
 
+os.system("echo ======='"+today.strftime('%Y_%m_%d')+"=======' >> "+LOG_PATH)
+
 Command = "git clone --recurse-submodules "+REPOSITORY+" --branch "+BRANCH+" "+WORKSPACE
-#os.system("echo '"+Command+"' >> fetch"+today.strftime('%Y_%m_%d')+".sh")
-print("echo '"+Command+"' >> fetch"+today.strftime('%Y_%m_%d')+".sh")
-#os.system(Command)
+os.system("echo '"+Command+"' >> fetch.log")
+logging.debug("echo '"+Command+"' >> "+LOG_PATH)
+os.system(Command)
 print(Command)
-Command = "cd $WORKPASCE"
-#os.system("echo '"+Command+"' >> fetch"+today.strftime('%Y_%m_%d')+".sh")
-#os.system(Command)
+
+Command = "cd "+WORKSPACE
+os.system("echo '"+Command+"' >> "+LOG_PATH)
+os.system(Command)
 Command = "git submodule foreach git checkout "+BRANCH
-#os.system("echo '"+Command+"' >> fetch"+today.strftime('%Y_%m_%d')+".sh")
-#os.system(Command)
+os.system("echo '"+Command+"' >> "+LOG_PATH)
+os.system(Command)
 
 
