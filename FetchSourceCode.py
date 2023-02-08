@@ -161,11 +161,12 @@ logging.debug("echo '"+Command+"' >> "+LOG_PATH)
 os.system(Command)
 print(Command)
 
+CurrentDir = os.getcwd()
+os.chdir(CurrentDir+"/"+WORKSPACE)
 Command = "cd "+WORKSPACE
-os.system("echo '"+Command+"' >> "+LOG_PATH)
-os.system(Command)
+os.system("echo '"+Command+"' >> ../"+LOG_PATH)
 Command = "git submodule foreach git checkout "+BRANCH
-os.system("echo '"+Command+"' >> "+LOG_PATH)
+os.system("echo '"+Command+"' >> ../"+LOG_PATH)
 os.system(Command)
 
 
